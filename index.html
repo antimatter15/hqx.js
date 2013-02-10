@@ -1,0 +1,38 @@
+<html>
+	<head>
+		<title>hq2x</title>
+		<style type="text/css">
+			canvas, img {
+				border: 1px solid gray;
+				margin: 10px;
+			}
+		</style>
+	</head>
+	<body>
+		<img id='i'>
+		<canvas id='c'></canvas>
+		<script type="text/javascript" src="hq2x.js"></script>
+		<script type="text/javascript">
+			var i = document.getElementById('i');
+			var c = document.getElementById('c');
+			var x = c.getContext('2d');
+			var cd = null;
+			var dd = null;
+			i.onload = function(){
+				var X = i.width, Y = i.height;
+
+				i.width = c.width = 2 * X;
+				i.height = c.height = 2 * Y;
+
+				x.drawImage(i, 0, 0);
+				cd = x.getImageData(0, 0, X, Y);
+				console.time("upscale")
+				var data = hq2x(cd);
+				console.timeEnd("upscale")
+				x.putImageData(data, 0, 0)
+
+			}
+			i.src = "win31.png"
+		</script>
+	</body>
+</html>
