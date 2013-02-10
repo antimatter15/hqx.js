@@ -121,6 +121,9 @@ var hq2x = (function(){
 	}
 
 
+	var canvas = document.createElement('canvas');
+	var ctx = canvas.getContext('2d');
+
 	function hq2x(src, options){
 		options = options || {}
 		var trY = options.trY || 48, 
@@ -131,10 +134,7 @@ var hq2x = (function(){
 			wrapY = options.wrapY || false;
 
 		var Xres = src.width, Yres = src.height;
-
-		var canvas = document.createElement('canvas');
-		var ctx = canvas.getContext('2d');
-		var dest = ctx.createImageData(src.width * 2, src.height * 2);
+		var dest = ctx.createImageData(Xres * 2, Yres * 2);
 
 		function get_pixel(pos){
 			return  (255 << 24) | 
@@ -143,6 +143,7 @@ var hq2x = (function(){
 					(src.data[pos * 4 + 1] << 8) | 
 					(src.data[pos * 4 + 2])
 		}
+
 		function set_pixel(pos, val){
 			dest.data[pos * 4    ] = (val & 0x00FF0000) >> 16;
 			dest.data[pos * 4 + 1] = (val & 0x0000FF00) >> 8;
@@ -150,28 +151,17 @@ var hq2x = (function(){
 			dest.data[pos * 4 + 3] = 255 //(val & 0xFF000000) >> 24;
 		}
 
-
-
 		var spIdx = 0, dpIdx = 0;
 		//Don't shift trA, as it uses shift right instead of a mask for comparisons.
 		trY <<= 2 * 8;
 		trU <<= 1 * 8;
 		var dpL = Xres * 2;
-
 		var prevline, nextline;
 		var w = new Uint32Array(9);
 
 		for (var j = 0; j < Yres; j++) {
-			prevline = (j > 0)
-					? -Xres
-					: wrapY
-						? Xres * (Yres - 1)
-						: 0;
-			nextline = (j < Yres - 1)
-					? Xres
-					: wrapY
-						? -(Xres * (Yres - 1))
-						: 0;
+			prevline = (j > 0) ? -Xres : wrapY ? Xres * (Yres - 1) : 0;
+			nextline = (j < Yres - 1) ? Xres : wrapY ? -(Xres * (Yres - 1)) : 0;
 			for (var i = 0; i < Xres; i++) {
 				w[1] = get_pixel(spIdx + prevline);
 				w[4] = get_pixel(spIdx);
@@ -209,11 +199,9 @@ var hq2x = (function(){
 					}
 				}
 
-				var pattern = 0;
-				var flag = 1;
+				var pattern = 0, flag = 1;
 
-				for (var k = 0; k < 9; k++)
-				{
+				for (var k = 0; k < 9; k++){
 					if (k == 4) continue;
 
 					if (w[k] != w[4])
