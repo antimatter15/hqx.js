@@ -5,6 +5,7 @@
 			canvas, img {
 				border: 1px solid gray;
 				margin: 10px;
+				background: blue;
 			}
 		</style>
 	</head>
@@ -27,12 +28,12 @@
 				x.drawImage(i, 0, 0);
 				cd = x.getImageData(0, 0, X, Y);
 				console.time("upscale")
-				var data = hq2x(cd);
+				dd = hq2x(cd);
 				console.timeEnd("upscale")
-				x.putImageData(data, 0, 0)
+				x.putImageData(dd, 0, 0)
 
 			}
-			i.src = "win31.png"
+			i.src = "transmit_error.png"
 		</script>
 	</body>
 </html>
